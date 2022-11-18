@@ -19,6 +19,10 @@ public class Simple {
 
     @GetMapping()
     String getsimple(@RequestHeader("authorization") String authorization) throws Exception {
-        return PublicKeyReader.verify(authorization.replace("Bearer ",""));
+        if (PublicKeyReader.verify(authorization.replace("Bearer ",""))) {
+            return PublicKeyReader.getPayload(authorization.replace("Bearer ",""));
+        } else {
+            return  PublicKeyReader.errorMsg;
+        }
     }
 }

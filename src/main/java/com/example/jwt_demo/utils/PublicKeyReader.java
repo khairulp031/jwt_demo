@@ -17,6 +17,7 @@ import java.util.Base64;
 public class PublicKeyReader {
 
     static RSAPublicKey rsaPublicKey;
+    public static String errorMsg="";
     private static RSAPublicKey getRSAPublicKey() throws Exception {
         if (rsaPublicKey !=null) {
             return rsaPublicKey;
@@ -36,20 +37,24 @@ public class PublicKeyReader {
         return rsaPublicKey;
     }
 
-    public static String verify(String token) {
+    public static boolean verify(String token) {
         try {
             RSAPublicKey rsaPublicKey = getRSAPublicKey();
             Algorithm algorithm = Algorithm.RSA512(rsaPublicKey, null);
             JWTVerifier verifier = JWT.require(algorithm)
                     .build();
             DecodedJWT verifiedJWT = verifier.verify(token);
-            Base64.Decoder decoder = Base64.getUrlDecoder();
-            String[] chunks = token.split("\\.");
-            String payload = new String(decoder.decode(chunks[1]));
-            return payload;
+            return true;
         } catch (Exception e) {
-          return e.toString();
+            errorMsg=e.toString();
+            return false;
         }
+    }
 
+    public static String getPayload(String token) {
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String[] chunks = token.split("\\.");
+        String payload = new String(decoder.decode(chunks[1]));
+        return payload;
     }
 }
